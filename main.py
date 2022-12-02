@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 
 col_about_to_die = (200, 200, 225)
-col_alive = (255, 255, 215)
+col_alive = (100, 155, 200)
 col_background = (10, 10, 40)
 col_grid = (30, 30, 60)
 
@@ -29,7 +29,7 @@ def init(dimx, dimy):
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,1,1,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0],
-                        [1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        [1,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
@@ -39,21 +39,23 @@ def init(dimx, dimy):
     return cells
 
 def main(dimx, dimy, cellsize):
+    c=0
     pygame.init()
     surface = pygame.display.set_mode((dimx * cellsize, dimy * cellsize))
     pygame.display.set_caption("John Conway's Game of Life")
-
     cells = init(dimx, dimy)
-
     while True:
         for event in pygame.event.get():
+            c+=1
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if c==15:
+                pygame.quit()
                 return
-
         surface.fill(col_grid)
         cells = update(surface, cells, cellsize)
         pygame.display.update()
+
 
 if __name__ == "__main__":
     main(120, 90, 8)
