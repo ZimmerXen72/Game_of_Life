@@ -52,7 +52,7 @@ def main(dimx, dimy, cellsize):
 
     while True:
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
-        if seconds > 10:
+        if seconds > 5:
             break
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
