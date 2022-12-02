@@ -47,9 +47,7 @@ def main(dimx, dimy, cellsize):
     while True:
         for event in pygame.event.get():
             c+=1
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if c==15:
+            if event.type == pygame.QUIT or c==30:
                 pygame.quit()
                 return
         surface.fill(col_grid)
