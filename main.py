@@ -47,8 +47,6 @@ def boardToString(board, pad=0):
             board_str += "X" if Cell(x, y) in board else "."
         board_str += "\n"
     return board_str.strip()
-
-
 if __name__ == "__main__":
     f = generateBoard("......X.\nXX......\n.X...XXX")
     for _ in range(130):
