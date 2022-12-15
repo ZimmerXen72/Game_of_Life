@@ -1,5 +1,5 @@
 import unittest
-if True:
-     print("ok")
+while True:
+     continue
 if __name__ == "__main__":
     unittest.main()
