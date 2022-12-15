@@ -1,44 +1,59 @@
-from collections import namedtuple, defaultdict
-import time
-Cell = namedtuple("Cell", ["x", "y"])
-def getNeighbors(cell):
-    for x in range(cell.x - 1, cell.x + 2):
-        for y in range(cell.y - 1, cell.y + 2):
-            if (x, y) != (cell.x, cell.y):
-                yield Cell(x, y)
-def getNeighborCount(board):
-    neighbor_counts = defaultdict(int)
-    for cell in board:
-        for neighbor in getNeighbors(cell):
-            neighbor_counts[neighbor] += 1
-    return neighbor_counts
-def advanceBoard(board):
-    new_board = set()
-    for cell, count in getNeighborCount(board).items():
-        if count == 3 or (cell in board and count == 2):
-            new_board.add(cell)
-    return new_board
-def generateBoard(desc):
-    board = set()
-    for row, line in enumerate(desc.split("\n")):
-        for col, elem in enumerate(line):
-            if elem == "X":
-                board.add(Cell(int(col), int(row)))
-    return board
-def boardToString(board, pad=0):
-    if not board:
-        return "empty"
-    board_str = ""
-    xs = [x for (x, _) in board]
-    ys = [y for (_, y) in board]
-    for y in range(min(ys) - pad, max(ys) + 1 + pad):
-        for x in range(min(xs) - pad, max(xs) + 1 + pad):
-            board_str += "X" if Cell(x, y) in board else "."
-        board_str += "\n"
-    return board_str.strip()
+import pygame
+import numpy as np
+
+col_about_to_die = (200, 200, 225)
+col_alive = (255, 255, 215)
+col_background = (10, 10, 40)
+col_grid = (30, 30, 60)
+
+def update(surface, cur, sz):
+    nxt = np.zeros((cur.shape[0], cur.shape[1]))
+
+    for r, c in np.ndindex(cur.shape):
+        num_alive = np.sum(cur[r-1:r+2, c-1:c+2]) - cur[r, c]
+
+        if cur[r, c] == 1 and num_alive < 2 or num_alive > 3:
+            col = col_about_to_die
+        elif (cur[r, c] == 1 and 2 <= num_alive <= 3) or (cur[r, c] == 0 and num_alive == 3):
+            nxt[r, c] = 1
+            col = col_alive
+
+        col = col if cur[r, c] == 1 else col_background
+        pygame.draw.rect(surface, col, (c*sz, r*sz, sz-1, sz-1))
+
+    return nxt
+
+def init(dimx, dimy):
+    cells = np.zeros((dimy, dimx))
+    pattern = np.array([[0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,1,1,0,0,0],
+                        [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0],
+                        [1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                        [1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]);
+    pos = (3,3)
+    cells[pos[0]:pos[0]+pattern.shape[0], pos[1]:pos[1]+pattern.shape[1]] = pattern
+    return cells
+
+def main(dimx, dimy, cellsize):
+    pygame.init()
+    surface = pygame.display.set_mode((dimx * cellsize, dimy * cellsize))
+    pygame.display.set_caption("John Conway's Game of Life")
+
+    cells = init(dimx, dimy)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+
+        surface.fill(col_grid)
+        cells = update(surface, cells, cellsize)
+        pygame.display.update()
+
 if __name__ == "__main__":
-    f = generateBoard("......X.\nXX......\n.X...XXX")
-    for _ in range(130):
-        f = advanceBoard(f)
-        print("\033[2J\033[1;1H" + boardToString(f, 2))
-        time.sleep(0.1)
+    main(120, 90, 8)
