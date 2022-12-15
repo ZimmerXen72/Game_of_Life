@@ -1,32 +1,23 @@
 from collections import namedtuple, defaultdict
 import time
-
 Cell = namedtuple("Cell", ["x", "y"])
-
-
 def getNeighbors(cell):
     for x in range(cell.x - 1, cell.x + 2):
         for y in range(cell.y - 1, cell.y + 2):
             if (x, y) != (cell.x, cell.y):
                 yield Cell(x, y)
-
-
 def getNeighborCount(board):
     neighbor_counts = defaultdict(int)
     for cell in board:
         for neighbor in getNeighbors(cell):
             neighbor_counts[neighbor] += 1
     return neighbor_counts
-
-
 def advanceBoard(board):
     new_board = set()
     for cell, count in getNeighborCount(board).items():
         if count == 3 or (cell in board and count == 2):
             new_board.add(cell)
     return new_board
-
-
 def generateBoard(desc):
     board = set()
     for row, line in enumerate(desc.split("\n")):
@@ -34,8 +25,6 @@ def generateBoard(desc):
             if elem == "X":
                 board.add(Cell(int(col), int(row)))
     return board
-
-
 def boardToString(board, pad=0):
     if not board:
         return "empty"
